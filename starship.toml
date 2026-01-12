@@ -1,0 +1,114 @@
+# starship.toml - Configuración personalizada para un prompt informativo y colorido en Linux
+# Incluye mucha información: usuario, host, directorio, git, duración de comandos, batería, hora, y IP local.
+# Colores vibrantes para cada módulo. Personalizado para @ItsDPR con emojis y estilos.
+# Ubicación: ~/.config/starship.toml
+# Instala Starship: curl -sS https://starship.rs/install.sh | sh
+# Aplica: eval "$(starship init bash)" (o tu shell preferida)
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Formato general del prompt: multi-línea para más info, con todos los módulos clave.
+add_newline = true  # Añade una línea nueva entre prompts para claridad.
+format = """
+[🚀](bold purple) $username$hostname$custom.ip$directory$git_branch$git_status
+$cmd_duration$battery$time$character"""
+
+# Paleta de colores personalizada (opcional, pero para consistencia).
+[palettes.custom]
+primary = '#00ff00'  # Verde vibrante
+secondary = '#ff00ff'  # Magenta
+accent = '#00ffff'  # Cian
+warning = '#ffff00'  # Amarillo
+error = '#ff0000'  # Rojo
+
+# palette = 'custom'  # Descomenta para usar la paleta definida arriba.
+
+# Módulo: Usuario - Muestra el nombre de usuario con color según root/normal.
+[username]
+show_always = true
+style_user = 'bold green'
+style_root = 'bold red'
+format = '[$user](bold green) '
+
+# Módulo: Hostname - Muestra el hostname con símbolo SSH si es remoto.
+[hostname]
+ssh_only = false
+ssh_symbol = '🌐 '
+format = 'en [$hostname](bold blue) '
+style = 'bold blue'
+
+# Módulo personalizado: IP local - Muestra la IP principal (usando comando Linux).
+[custom.ip]
+command = "hostname -I | awk '{print $1}'"  # Comando para obtener IP primaria en Linux. Alternativa: "ip addr show | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d/ -f1 | head -n1"
+when = true  # Siempre mostrar.
+format = '[🌐 $output](bold cyan) '
+style = 'bold cyan'
+shell = ['bash', '-c']  # Usa bash para el comando.
+
+# Módulo: Directorio - Ruta actual con truncado y símbolo de solo-lectura.
+[directory]
+truncation_length = 3
+truncation_symbol = '…/'
+home_symbol = '🏠 ~'
+read_only = ' 🔒'
+read_only_style = 'red'
+style = 'bold yellow'
+format = 'en [$path]($style)[$read_only]($read_only_style) '
+
+# Módulo: Git Branch - Rama actual con símbolo personalizado.
+[git_branch]
+symbol = '🌿 '
+truncation_length = 10
+truncation_symbol = '...'
+style = 'bold purple'
+format = 'en [$symbol$branch]($style) '
+
+# Módulo: Git Status - Estado del repo con símbolos coloridos para cambios.
+[git_status]
+conflicted = '🏳 '
+ahead = '⇡${count} '
+behind = '⇣${count} '
+diverged = '⇕ '
+untracked = '🤷 '
+stashed = '📦 '
+modified = '📝 '
+staged = '[++\($count\)](green) '
+renamed = '👅 '
+deleted = '🗑 '
+style = 'bold red'
+format = '([$all_status$ahead_behind]($style)) '
+
+# Módulo: Duración del comando - Tiempo del último comando si >1s.
+[cmd_duration]
+min_time = 1000  # Muestra si >1 segundo.
+show_milliseconds = true
+style = 'bold yellow'
+format = '[ tomó $duration](bold yellow) '
+
+# Módulo: Batería - Nivel de batería con símbolos y colores según estado.
+[battery]
+full_symbol = '🔋 '
+charging_symbol = '⚡ '
+discharging_symbol = '💀 '
+unknown_symbol = '❓ '
+empty_symbol = '🪫 '
+format = '[$symbol$percentage](bold green) '
+[[battery.display]]
+threshold = 10
+style = 'bold red'
+[[battery.display]]
+threshold = 30
+style = 'bold yellow'
+
+# Módulo: Hora - Hora actual en formato 24h con color.
+[time]
+disabled = false
+format = '🕒 [$time](bold white) '
+time_format = '%T'  # HH:MM:SS
+style = 'bold white'
+use_12hr = false
+
+# Módulo: Carácter final - Flecha o símbolo para input, cambia si último comando falló.
+[character]
+success_symbol = '[➜](bold green)'
+error_symbol = '[✗](bold red)'
